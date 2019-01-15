@@ -17,9 +17,10 @@ def tryString(attempted_string, salt, correct_hash):
   m = hashlib.md5()
 
   m.update(attempted_string)
-  m.update(salt)
 
-  return m.digest() == correct_hash
+  print(m.hexdigest())
+
+  return m.hexdigest() == correct_hash
 
 
 
@@ -29,7 +30,7 @@ def crack(salt, correct_hash):
   
 def test_tryString():
 
-  print(tryString("test", "001", "fa820cc1ad39a4e99283e9fa555035ec"))
+  print(tryString("test", "001", "4bc5822a79417bca40ef56cb86a2bf7e"))
 
 def test_iters():
 
