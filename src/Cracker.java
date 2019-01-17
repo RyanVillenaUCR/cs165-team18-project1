@@ -104,9 +104,7 @@ public class Cracker {
 	public static byte[] getAlternateSum(String password)
 			throws NoSuchAlgorithmException {
 		
-		MessageDigest md;
-		
-		md = MessageDigest.getInstance(MD5);
+		MessageDigest md = MessageDigest.getInstance(MD5);
 		
 		md.update(password.getBytes());
 		md.update(SALT.getBytes());
