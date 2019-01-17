@@ -1,5 +1,13 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Time;
+import java.util.Arrays;
 
 
 public class Cracker {
@@ -10,71 +18,205 @@ public class Cracker {
 	
 	final static String MD5   = "MD5";	//for instantiating MessageDigests
 	
-	public static void crack() {
-		
-		//TODO
-		
-	}
+	final static String CRYPT_BASE64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	
-	public static byte[] getIntermediate0(String password, byte[] alternateSum) {
+	public static String crack() {
 		
-		try {
+		for (char c1 = 'a'; c1 <= 'z'; c1++) {
 			
-			MessageDigest md = MessageDigest.getInstance("MD5");
+			String s1 = new String();
+			s1 += c1;
 			
-			md.update(password.getBytes());
-			md.update(MAGIC.getBytes());
-			md.update(SALT.substring(0, 9).getBytes());
-			md.update(alternateSum, 0, password.length());
+			if (hash(s1).equals(HASH))
+				return s1;
 			
-			String pwLengthBitString = Integer.toBinaryString(password.length());
-			for (int i = password.length() - 1; i >= 0; i--) {
+			for (char c2 = 'a'; c2 <= 'z'; c2++) {
 				
-				if (pwLengthBitString.charAt(i) == '1')
-					md.update( (byte) '\0');
-				else
-					md.update( (byte) password.charAt(0));
+				String s2 = new String(s1);
+				s2 += c2;
+				
+				if (hash(s2).equals(HASH))
+					return s2;
+				
+				for (char c3 = 'a'; c3 <= 'z'; c3++) {
+					
+					String s3 = new String(s2);
+					s3 += c3;
+					
+					if (hash(s3).equals(HASH))
+						return s3;
+					
+					for (char c4 = 'a'; c4 <= 'z'; c4++) {
+						
+						String s4 = new String(s3);
+						s4 += c4;
+						
+						if (hash(s4).equals(HASH))
+							return s4;
+						
+						for (char c5 = 'a'; c5 <= 'z'; c5++) {
+							
+							String s5 = new String(s4);
+							s5 += c5;
+							
+							if (hash(s5).equals(HASH))
+								return s5;
+							
+							for (char c6 = 'a'; c6 <= 'z'; c6++) {
+								
+								String s6 = new String(s5);
+								s6 += c6;
+								
+								if (hash(s6).equals(HASH))
+									return s6;
+							}
+						}
+					}
+				}
 			}
-			
-			
-			
-			return md.digest();
-			
-			
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return e.getMessage().getBytes();
 		}
 		
-		 
+		return "Crack failed";
 	}
 	
-	public static byte[] getAlternateSum(String password) {
+	public static byte[] getIntermediate_0(String password, byte[] alternateSum)
+			throws NoSuchAlgorithmException {
+			
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		
+		md.update(password.getBytes());
+		md.update(MAGIC.getBytes());
+		md.update(SALT.substring(0, 8).getBytes());
+		md.update(alternateSum, 0, password.length());	//only works because pw.len() is always <= 6
+		
+		String pwLengthBitString = Integer.toBinaryString(password.length());
+		for (int i = password.length() - 1; i >= 0; i--) {
+			
+			if (pwLengthBitString.charAt(i) == '1')
+				md.update( (byte) '\0');
+			else
+				md.update( (byte) password.charAt(0));
+		}
+		
+		return md.digest();
+	}
+	
+	public static byte[] getAlternateSum(String password)
+			throws NoSuchAlgorithmException {
 		
 		MessageDigest md;
 		
-		try {
+		md = MessageDigest.getInstance(MD5);
+		
+		md.update(password.getBytes());
+		md.update(SALT.getBytes());
+		md.update(password.getBytes());
+		
+		return md.digest();
+	}
+	
+	public static byte[] getIntermediate_1000(String password, byte[] alternateSum, byte[] intermediate_0) throws NoSuchAlgorithmException {
+		
+		MessageDigest md = MessageDigest.getInstance(MD5);
+		byte[] intermediate = Arrays.copyOf(intermediate_0, intermediate_0.length);
+		
+		for (int i = 0; i < 1000; i++) {
 			
-			md = MessageDigest.getInstance("MD5");
+			md.reset();
 			
-			md.update(password.getBytes());
-			md.update(SALT.getBytes());
-			md.update(password.getBytes());
+			if (i % 2 == 0)
+				md.update(intermediate);
+			if (i % 2 == 1)
+				md.update(password.getBytes());
+			if (i % 3 != 0)
+				md.update(SALT.getBytes());
+			if (i % 7 != 0)
+				md.update(password.getBytes());
+			if (i % 2 == 0)
+				md.update(password.getBytes());
+			if (i % 2 == 1)
+				md.update(intermediate);
 			
-			return md.digest();
+			intermediate = md.digest();
+		}
+		
+		return intermediate;
+	}
+	
+	public static void shuffleBytes(byte[] shuffleMe) {
+		
+		assert shuffleMe.length == 16;
+		
+		int[] key = { 11, 4, 10, 5, 3, 9, 15, 2, 8, 14, 1, 7, 13, 0, 6, 12 };
+		byte[] temp = Arrays.copyOf(shuffleMe, shuffleMe.length);
+		
+		for (int i = 0; i < shuffleMe.length; i++) {
 			
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "\0".getBytes();
+			shuffleMe[i] = temp[key[i]];
 		}
 	}
 	
-	public static boolean testPassword(String password) {
+	public static String cryptBase64(byte[] encryptMe) {
 		
-		//@TODO
-		return false;
+		//Convert encryptMe to one huge bitstring
+		StringBuilder sb = new StringBuilder();
+		
+		for (int i = 0; i < encryptMe.length; i++) {
+			
+			String binary_byte = Integer.toBinaryString(encryptMe[i]);
+			sb.append(binary_byte);
+		}
+		String bitstring = sb.toString();
+		
+		
+		
+		//Then, store 22 groups of 6-bit bitstrings into an array
+		String[] miniBitstrings = new String[22];
+		for (int i = 0; i < 22; i++) {
+			
+			int offset_index = 6 * i;
+			String substr = bitstring.substring(offset_index, offset_index + 6);
+			miniBitstrings[i] = substr;
+		}
+		
+		
+		
+		//Finally, output the corresponding CryptBase64 character to each miniBitstring's decimal conversion
+		StringBuilder finalResult = new StringBuilder();
+		for (int i = 0; i < 22; i++) {	//TODO figure out which to use
+//		for (int i = 21; i >= 0; i--) {
+			
+			int index = Integer.parseInt(miniBitstrings[i], 2);
+			byte c = (byte) CRYPT_BASE64.charAt(index);
+			finalResult.append(c);
+		}
+		
+		return finalResult.toString();
+	}
+	
+	public static String hash(String password) {
+		
+		try {
+			
+			byte[] alternateSum = getAlternateSum(password);
+			byte[] intermediate_0 = getIntermediate_0(password, alternateSum);
+			byte[] intermediate_1000 = getIntermediate_1000(password, alternateSum, intermediate_0);
+		
+			//now, intermediate is intermediate_1000
+			assert intermediate_1000.length == 16;
+			shuffleBytes(intermediate_1000);
+			
+			String finalHash = cryptBase64(intermediate_1000);
+			assert finalHash.length() == 22;
+			
+			return finalHash;
+			
+		} catch (NoSuchAlgorithmException e) {
+			
+			e.printStackTrace();
+			return e.getMessage();
+		}
+
 	}
 	
 	public static void randomTests() {
@@ -87,7 +229,6 @@ public class Cracker {
 //			System.out.println(md.toString());
 //			
 //		} catch (NoSuchAlgorithmException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //			System.out.println(e.getMessage());
 //		}
@@ -103,13 +244,54 @@ public class Cracker {
 //		test = test - 1;
 //		System.out.println(test);
 		
+//		writeToOutputFile("Will I append or overwrite? Hopefully overwrite!");
+//		writeToOutputFile("Aaaaand, testing if I can write multiple lines!");
+//		writeToOutputFile("wait am i even changing anything here?");
+	}
+		
+	public static void log(String text) {
+		
+		File f = new File("output.txt");
+		try {
+			f.createNewFile();
+		} catch (IOException e1) {
+
+			e1.printStackTrace();
+		}
+		
+		try {
+			Writer w = new FileWriter(f, true);
+//			Writer w = new PrintWriter(f);
+			
+//			w.println(text);
+//			w.append(text);
+			
+			System.out.println(text);
+			w.write(text);
+			w.write(System.lineSeparator());		
+			
+			w.close();
+			
+		} catch (IOException e) {
+
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public static void main(String[] args) {
 
 		System.out.println("Hello world!");
 		
-		randomTests();
+//		randomTests();
+		
+		long initialTime = System.currentTimeMillis();
+		
+		String password = crack();
+		
+		log("Password: " + password);
+		log("Time taken: " + Long.toString(System.currentTimeMillis() - initialTime) + "ms");
+		
 
 	}
 
