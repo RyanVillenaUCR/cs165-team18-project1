@@ -1,29 +1,63 @@
-Operating system: Linux 
-Software required: Crypto libraries. You are allowed to use only the primitive hash functions that take a single input. For instance, hashlib.md5(string). Password cracking utilities are explicitly prohibited (but can be used for verification).
-Language: C/C++ or any other that you prefer. Note that speed may be a consideration.
+1. What's the length of return value of md5 function?
+
+   16 bytes
+   Sometimes you might see a 32-byte representation. For example, "6e14652f333d6482ece7d983743a5e37". 
+   In fact the result is represented in hexadecimal. e.g. 6e means a single byte 0x6e. 
+   32-byte representation is just for display purposes as some bytes cannot be rendered well as characters. 
+   During the computation you should use the 16-byte representation.
+   
+2. In initialization 3(4), what does "length(password) bytes of the Alternate sum, repeated as necessary" mean?
+
+   Let len1 = length of password, len2 = length of Alternate sum (16 bytes)
+   if len1<len2: pick the first len1 bytes of Alternate sum
+   is len1>len2: pick the first len1 bytes of repeated Alternate sum 
+   for example, if Alternate sum is "1234567891234567"  if password is "aaaaaa", then result here is "123456"
+                if password is "aaaaaabbbbbbccccccddddddeeeeeeffffff" , then result here is "123456789123456712345678912345671234"  
+
+3. In initialization 5 "For each bit in length(password), from low to high and stopping after the most significant set bit
+                       If the bit is set, append a NULL byte
+                       If it’s unset, append the first byte of the password"
+
+   "length(password)" is a number, e.g. "6", which is 0110 in binary. From low to high is bit is "0"(unset), "1"(set) ,"1"(set), "0"(unset). 
+   This means there will be 3 bytes being appended.
 
 
-In this project, you are asked to crack passwords from a "stolen" /etc/shadow file on a Linux system (See the file etc_shadow). You will work as teams of two. Each teacm will crack the password for team[i] where i is the team number that is assigned by the TA. Each line in the file has the hash type, salt, and the hash of the password.
-For instance, consider the first line "team0:$1$hfT7jp2q$/sDfNdP2e3OCxg2zGq1FK0:16653:0:99999:7:::", 
-$1$ indicates the hash algorithm to be MD5
-$hfT7jp2q$ indicates the salt to be hfT7jp2q
-$/sDfNdP2e3OCxg2zGq1FK0 indicates the password hash to be /sDfNdP2e3OCxg2zGq1FK0
+4. "Pick out the 16 bytes in this order: 11 4 10 5 3 9 15 2 8 14 1 7 13 0 6 12.
+   For each group of 6 bits (there are 22 groups), starting with the least significant
+   Output the corresponding base64 character with this index" 
+   
+   Here we need to reorder the byte sequence first. For example"
+   0123456789abcdef => b4a539f28e17d06c
 
-A common password cracking strategy is to bruteforce all possible passwords. This can be time-consuming and sometimes inefficient. Therefore, various "dictionary" of commonly used passwords from leaked sources have been used to speed up the process. However, in our case, the passwords are intentionally randomized so that the dictionary approach may not work well. Therefore, you are better off writing your bruteforce-style program to crack the password hashes. Note that there are existing tools that implement bruteforce password cracking on the Internet. You are NOT allowed to use them. You are, however, allowed to use the primitive hash functions such as hashlib.md5(string). Check out tutorials on how md5 password hashes are computed (with 1000 rounds of 
-primitive md5 hashes): https://www.vidarholen.net/contents/blog/?p=32. You may also learn (but not directly COPY) from reference implementations in various open source libraries.
+   We then group them by every 6-bits
+   16 bytes = 128 bits = 21 * 6 + 2 bits = 22 groups
+   
+   Finally, starting from the least significant group, we use the crypt base64 set and compute the final encoding.
 
-To allow passwords cracked within reasonable amount of time. The passwords for team users are generated with less than or equal to 6 characters (all lowercase letters only). For the bonus user password, it is 8 characters exact (lowercase letters only).
+   For example: For 4-byte sequence "abcd"
+   Its ASCII code is 97, 98, 99 ,100 respectively. Binary representation is 01100001 01100010 01100011 01100100
+   We then group them by every 6-bits, starting from the least significant byte "d". 
+   We get: 01 100001 011000 100110 001101 100100, or 1 33 24 38 13 36 in decimal.
+   Crypt base64 set is C = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+   Thus, the encoded result for "abcd" is YBaMV/
 
-Rules:
-- If you use any shared machines to perform the password cracking, you are NOT allowed to interfere with other people's use of machines. You can be penalized in grades if the rule is violated (e.g., from complaints)
+   Notice that in memory, "a" has the lowest address. But in here, we consider "d" as the least significant byte.
+   
+5. What MD5 function should I use?
 
+   For python, you can use : 
 
+       from hashlib import md5
 
-Submission requirement: 
-- (4 points) Show the correct password for your team user.
-- (4 points) Submit the following in a packaged file (zip or rar). 1) The source code. 2) The number of threads/processes is used. 3) The CPU model that your code is run on. 4) The throughput of password cracking, i.e., the number of candidate passwords tested per second.
-- (2 bonus points) Show the correct password for the bonus user (do not giveaway/copy results across teams).
+       md5(string).digest()
 
+   For C:
 
+       #include <openssl/md5.h>
 
-After successfully completing this project, you can use the cracked password to login to the server and obtain the instructions of project 2 and have a head start. The later projects are substantially more time-consuming and it is best that you complete project 1 as early as you can.
+       MD5_CTX context;
+       MD5Init(&context);
+       MD5Update(&context, string, length);
+       MD5Final(result, &context);
+   
+   Search them on Google for more details.
