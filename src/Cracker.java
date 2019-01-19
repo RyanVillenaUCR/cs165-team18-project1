@@ -188,17 +188,24 @@ public class Cracker {
 			sb.append(binary_byte);
 		}
 		String bitstring = sb.toString();
-		bitstring = bitstring.substring(2);	//First 2 chars will not be used
+//		System.out.println("bitstring: " + bitstring);
+//		System.out.println("bitstring.length: " + bitstring.length());
 		
-		//Then, store 21 groups of 6-bit bitstrings into an array
-		String[] miniBitstrings = new String[21];
-		for (int i = 0; i < miniBitstrings.length; i++) {
+		
+		//Then, store 22 groups of 6-bit bitstrings into an array
+		String[] miniBitstrings = new String[22];
+		
+		miniBitstrings[0] = bitstring.substring(0, 2);	//Handle the first string separately
+		bitstring = bitstring.substring(2);				//Now, just take the remaining 21 strings
+		for (int i = 0; i < miniBitstrings.length - 1; i++) {
 			
-			int offset_index = 6 * i;
-			String substr = bitstring.substring(offset_index, offset_index + 6);
-			miniBitstrings[i] = substr;
-
+			int firstIndex = i * 6;
+			int lastIndex = firstIndex + 6;
+			String substr = bitstring.substring(firstIndex, lastIndex);
+//			System.out.println("Last valid i: " + i);
+			miniBitstrings[i + 1] = substr;
 		}
+		
 		
 		//Finally, output the corresponding CryptBase64 character to each miniBitstring's decimal conversion
 		StringBuilder finalResult = new StringBuilder();
@@ -401,7 +408,7 @@ public class Cracker {
 			
 			
 			//Test cryptBase64
-			String expectedCryptBase64 = "9TvDSyPgrW9ypSVM4lXCs";
+			String expectedCryptBase64 = "9TvDSyPgrW9ypSVM4lXCs.";
 			shuffleBytes(actualIntermediate1000);
 			String actualCryptBase64 = cryptBase64(actualIntermediate1000);
 			System.out.println("Expected CryptBase64: " + expectedCryptBase64);
@@ -412,11 +419,21 @@ public class Cracker {
 			
 			
 			//Test hash
-			String expectedHash = "9TvDSyPgrW9ypSVM4lXCs";
+			String expectedHash = "9TvDSyPgrW9ypSVM4lXCs.";
 			String actualHash = hash(password, salt);
 			System.out.println("Expected hash: " + expectedHash);
 			System.out.println("Actual hash:   " + actualHash);
 			System.out.println("Works? " + expectedHash.equals(actualHash));
+			System.out.println("");
+			
+			
+			
+			//Test hash 2
+			String expectedHash2 = "g.L45izUKySxx0yWx8.xn1";
+			String actualHash2 = hash("aecujj", "hfT7jp2q");
+			System.out.println("Expected hash: " + expectedHash2);
+			System.out.println("Actual hash:   " + actualHash2);
+			System.out.println("Works? " + expectedHash2.equals(actualHash2));
 			System.out.println("");
 			
 			
