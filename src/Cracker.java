@@ -333,10 +333,7 @@ public class Cracker {
 			byte[] actualAlternateSum = getAlternateSum(password, salt);
 			System.out.println("Expected AlternateSum: \"" + Arrays.toString(expectedAlternateSum) + "\"");
 			System.out.println("Actual AlternateSum:   \"" + Arrays.toString(actualAlternateSum) + "\"");
-			System.out.println(Arrays.equals(expectedAlternateSum, actualAlternateSum));
-			
-			String strAlternateSum = getAlternateSum(password, salt).toString();
-			System.out.println(strAlternateSum);
+			System.out.println("Works? " + Arrays.equals(expectedAlternateSum, actualAlternateSum));
 			
 			
 			
