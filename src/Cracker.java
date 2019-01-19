@@ -188,21 +188,17 @@ public class Cracker {
 			sb.append(binary_byte);
 		}
 		String bitstring = sb.toString();
-//		System.out.println("bitstring: " + bitstring);
-//		System.out.println("bitstring.length: " + bitstring.length());
 		
 		
 		//Then, store 22 groups of 6-bit bitstrings into an array
 		String[] miniBitstrings = new String[22];
 		
 		miniBitstrings[0] = bitstring.substring(0, 2);	//Handle the first string separately
-		bitstring = bitstring.substring(2);				//Now, just take the remaining 21 strings
 		for (int i = 0; i < miniBitstrings.length - 1; i++) {
 			
-			int firstIndex = i * 6;
+			int firstIndex = i * 6 + 2;
 			int lastIndex = firstIndex + 6;
 			String substr = bitstring.substring(firstIndex, lastIndex);
-//			System.out.println("Last valid i: " + i);
 			miniBitstrings[i + 1] = substr;
 		}
 		
