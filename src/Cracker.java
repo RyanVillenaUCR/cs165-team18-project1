@@ -156,11 +156,9 @@ public class Cracker {
 		}
 	}
 		
-	public static boolean[] toBinaryArray(byte b) {
-		
-		boolean[] bitstring = new boolean[8];
+	public static String toBitstring(byte b) {
 
-		int integer = (b & 0x00FF);
+		int integer = (b & 0x00FF);	//mask off any sign bits from cast
 		
 		String bin_str = Integer.toBinaryString(integer);
 		assert bin_str.length() <= 8;
@@ -171,12 +169,13 @@ public class Cracker {
 		}
 		assert bin_str.length() == 8;		
 		
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 8; i++) {
 			
-			bitstring[i] = (bin_str.charAt(i) == '1');
+			sb.append(bin_str.charAt(i));
 		}
 			
-		return bitstring;
+		return sb.toString();
 	}
 	
 	public static String cryptBase64(byte[] encryptMe) {
@@ -314,7 +313,7 @@ public class Cracker {
 		
 		byte b = -61;
 		System.out.println("Testing byte with value " + b);
-		System.out.println("Bitstring: " + Arrays.toString(toBinaryArray(b)));
+		System.out.println("Bitstring: " + toBitstring(b));
 	}
 		
 	public static void log(String text) {
