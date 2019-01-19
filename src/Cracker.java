@@ -176,22 +176,29 @@ public class Cracker {
 		
 		//Then, store 22 groups of 6-bit bitstrings into an array
 		String[] miniBitstrings = new String[22];
-		for (int i = 0; i < 22; i++) {
+		for (int i = 0; i < miniBitstrings.length; i++) {
 			
 			int offset_index = 6 * i;
 			String substr = bitstring.substring(offset_index, offset_index + 6);
 			miniBitstrings[i] = substr;
 		}
 		
+//		System.out.println("miniBitStrings: " + Arrays.toString(miniBitstrings));
 		
 		
 		//Finally, output the corresponding CryptBase64 character to each miniBitstring's decimal conversion
 		StringBuilder finalResult = new StringBuilder();
-		for (int i = 0; i < 22; i++) {	//TODO figure out which to use
-//		for (int i = 21; i >= 0; i--) {
+//		for (int i = 0; i < 22; i++) {	//TODO figure out which to use
+		for (int i = 21; i >= 0; i--) {
 			
 			int index = Integer.parseInt(miniBitstrings[i], 2);
-			byte c = (byte) CRYPT_BASE64.charAt(index);
+//			System.out.println("miniBitstrings[" + i + "]: " + miniBitstrings[i]);
+//			System.out.println("Corresponding index: " + Integer.parseInt(miniBitstrings[i], 2));
+//			System.out.println("Corresponding byte: " + (byte) CRYPT_BASE64.charAt(index));
+//			System.out.println("Corresponding char: " + CRYPT_BASE64.charAt(index));
+//			System.out.println("");
+//			byte c = (byte) CRYPT_BASE64.charAt(index);
+			char c = CRYPT_BASE64.charAt(index);
 			finalResult.append(c);
 		}
 		
@@ -328,8 +335,8 @@ public class Cracker {
 					0x48, 0x1f, 0x7f, 0x46
 			};
 			byte[] actualAlternateSum = getAlternateSum(password, salt);
-			System.out.println("Expected AlternateSum: \"" + Arrays.toString(expectedAlternateSum) + "\"");
-			System.out.println("Actual AlternateSum:   \"" + Arrays.toString(actualAlternateSum) + "\"");
+			System.out.println("Expected AlternateSum: " + Arrays.toString(expectedAlternateSum) + "");
+			System.out.println("Actual AlternateSum:   " + Arrays.toString(actualAlternateSum) + "");
 			System.out.println("Works? " + Arrays.equals(expectedAlternateSum, actualAlternateSum));
 			System.out.println("");
 			
@@ -364,12 +371,36 @@ public class Cracker {
 			
 			
 			
+			//Test shuffleBytes
+			byte[] expectedShuffleBytes = {
+					0x0B, 0x04, 0x0A, 0x05,
+					0x03, 0x09, 0x0F, 0x02,
+					0x08, 0x0e, 0x01, 0x07,
+					0x0d, 0x00, 0x06, 0x0c
+			};
+			byte[] actualShuffleBytes = {
+					0x00, 0x01, 0x02, 0x03,
+					0x04, 0x05, 0x06, 0x07,
+					0x08, 0x09, 0x0A, 0x0B,
+					0x0C, 0x0D, 0x0E, 0x0F
+			};
+			shuffleBytes(actualShuffleBytes);
+			System.out.println("Expected shuffle bytes: " + Arrays.toString(expectedShuffleBytes));
+			System.out.println("Actual shuffle bytes:   " + Arrays.toString(expectedShuffleBytes));
+			System.out.println("Works? " + Arrays.equals(expectedShuffleBytes, actualShuffleBytes));
+			System.out.println("");
+			
+			
+			
 			//Test cryptBase64
 			String expectedCryptBase64 = "9TvDSyPgrW9ypSVM4lXCs";
+			shuffleBytes(actualIntermediate1000);
 			String actualCryptBase64 = cryptBase64(actualIntermediate1000);
 			System.out.println("Expected CryptBase64: " + expectedCryptBase64);
 			System.out.println("Actual CryptBase 64:  " + actualCryptBase64);
 			System.out.println("Works? " + expectedCryptBase64.equals(actualCryptBase64));
+			System.out.println("Expected CryptBase64 length: " + expectedCryptBase64.length());
+			System.out.println("Actual CryptBase64 length:   " + actualCryptBase64.length());
 			System.out.println("");
 			
 			
