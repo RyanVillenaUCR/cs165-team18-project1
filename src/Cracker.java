@@ -1,28 +1,31 @@
 import java.io.File;
-import java.io.FileNotFoundException;
+//import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+//import java.io.PrintWriter;
 import java.io.Writer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Time;
+//import java.sql.Time;
 import java.util.Arrays;
+import java.util.Date;
 
-import com.sun.org.apache.xml.internal.security.algorithms.MessageDigestAlgorithm;
+//import com.sun.org.apache.xml.internal.security.algorithms.MessageDigestAlgorithm;
 
 
 public class Cracker {
 
-	final static String SALT  = "hfT7jp2q";
-	final static String HASH  = "JU0X9xRQyTWTWY59e3Iqj1";
-	final static String MAGIC = "$1$";
+	final private static String SALT  = "hfT7jp2q";
+	final private static String HASH  = "JU0X9xRQyTWTWY59e3Iqj1";
+	final private static String MAGIC = "$1$";
 	
-	final static String MD5   = "MD5";	//for instantiating MessageDigests
+	final private static String MD5   = "MD5";	//for instantiating MessageDigests
 	
-	final static String CRYPT_BASE64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	final private static String CRYPT_BASE64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	
-	public static String crack() {
+	final private static Date INITIAL_DATE = new Date();
+	
+	private static String crack() {
 		
 		for (char c1 = 'a'; c1 <= 'z'; c1++) {
 			
@@ -40,51 +43,66 @@ public class Cracker {
 				if (hash(s2, SALT).equals(HASH))
 					return s2;
 				
-				for (char c3 = 'a'; c3 <= 'z'; c3++) {
-					
-					String s3 = new String(s2);
-					s3 += c3;
-					
-					if (hash(s3, SALT).equals(HASH))
-						return s3;
-					
-					for (char c4 = 'a'; c4 <= 'z'; c4++) {
-						
-						String s4 = new String(s3);
-						s4 += c4;
-						
-						if (hash(s4, SALT).equals(HASH))
-							return s4;
-						
-						for (char c5 = 'a'; c5 <= 'z'; c5++) {
-							
-							String s5 = new String(s4);
-							s5 += c5;
-							
-							if (hash(s5, SALT).equals(HASH))
-								return s5;
-							
-							for (char c6 = 'a'; c6 <= 'z'; c6++) {
-								
-								String s6 = new String(s5);
-								s6 += c6;
-								
-								if (hash(s6, SALT).equals(HASH))
-									return s6;
-							}
-						}
-					}
-				}
+//				for (char c3 = 'a'; c3 <= 'z'; c3++) {
+//					
+//					String s3 = new String(s2);
+//					s3 += c3;
+//					
+//					if (hash(s3, SALT).equals(HASH))
+//						return s3;
+//					
+//					for (char c4 = 'a'; c4 <= 'z'; c4++) {
+//						
+//						String s4 = new String(s3);
+//						s4 += c4;
+//						
+//						if (hash(s4, SALT).equals(HASH))
+//							return s4;
+//						
+//						for (char c5 = 'a'; c5 <= 'z'; c5++) {
+//							
+//							String s5 = new String(s4);
+//							s5 += c5;
+//							
+//							if (hash(s5, SALT).equals(HASH))
+//								return s5;
+//							
+//							for (char c6 = 'a'; c6 <= 'z'; c6++) {
+//								
+//								String s6 = new String(s5);
+//								s6 += c6;
+//								
+//								if (hash(s6, SALT).equals(HASH))
+//									return s6;
+//							}
+//						}
+//					}
+//				}
+				
+				log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
+				log("Finished all strings of all lengths starting with " + s2 + "____");
+				float nest1_percent = (float) ((c1 - 'a') * 100 / 26.0); //not c1 - 'a' + 1 because first nest hasn't yet finished
+				float nest2_percent = (float) ((c2 - 'a' + 1) * 100 / (26.0 * 26.0));
+				log((float) (nest1_percent + nest2_percent) + "%  of all possible strings tested.");
+				log("Current date/time: " + new Date().toString());
+				log("");
+				
 			}
+			
+			log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
+			log("Finished all strings of all lengths starting with " + s1 + "_____");
+			log((float) ((c1 - 'a' + 1) * 100 / 26.0) + "%  of all possible strings tested.");
+			log("Current date/time: " + new Date().toString());
+			log("");
 		}
 		
 		return "Crack failed";
 	}
 	
-	public static byte[] getIntermediate_0(String password, byte[] alternateSum)
+	private static byte[] getIntermediate_0(String password, byte[] alternateSum)
 			throws NoSuchAlgorithmException {
 			
-		MessageDigest md = MessageDigest.getInstance("MD5");
+		MessageDigest md = MessageDigest.getInstance(MD5);
 		
 		md.update(password.getBytes());
 		md.update(MAGIC.getBytes());
@@ -103,7 +121,7 @@ public class Cracker {
 		return md.digest();
 	}
 	
-	public static byte[] getAlternateSum(String password, String salt)
+	private static byte[] getAlternateSum(String password, String salt)
 			throws NoSuchAlgorithmException {
 		
 		MessageDigest md = MessageDigest.getInstance(MD5);
@@ -115,7 +133,7 @@ public class Cracker {
 		return md.digest();
 	}
 	
-	public static byte[] getIntermediate_1000(String password, byte[] alternateSum, byte[] intermediate_0) throws NoSuchAlgorithmException {
+	private static byte[] getIntermediate_1000(String password, byte[] alternateSum, byte[] intermediate_0) throws NoSuchAlgorithmException {
 		
 		MessageDigest md = MessageDigest.getInstance(MD5);
 		byte[] intermediate = Arrays.copyOf(intermediate_0, intermediate_0.length);
@@ -143,7 +161,7 @@ public class Cracker {
 		return intermediate;
 	}
 	
-	public static void shuffleBytes(byte[] shuffleMe) {
+	private static void shuffleBytes(byte[] shuffleMe) {
 		
 		assert shuffleMe.length == 16;
 		
@@ -156,7 +174,7 @@ public class Cracker {
 		}
 	}
 		
-	public static String toBitstring(byte b) {
+	private static String toBitstring(byte b) {
 
 		int integer = (b & 0x00FF);	//mask off any sign bits from cast
 		
@@ -178,7 +196,7 @@ public class Cracker {
 		return sb.toString();
 	}
 	
-	public static String cryptBase64(byte[] encryptMe) {
+	private static String cryptBase64(byte[] encryptMe) {
 		
 		//Convert encryptMe to one huge bitstring
 		StringBuilder sb = new StringBuilder();
@@ -215,7 +233,7 @@ public class Cracker {
 		return finalResult.toString();
 	}
 	
-	public static String hash(String password, String salt) {
+	private static String hash(String password, String salt) {
 		
 		try {
 			
@@ -240,7 +258,7 @@ public class Cracker {
 
 	}
 	
-	public static void randomTests() {
+	private static void randomTests() {
 		
 //		MessageDigest md;
 //		
@@ -299,7 +317,27 @@ public class Cracker {
 //		System.out.println("Bitstring: " + toBitstring(b));
 	}
 		
-	public static void log(String text) {
+	private static void clearOutputFile() {
+		
+		File f = new File("output.txt");
+		
+		try {
+			f.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			Writer w = new FileWriter(f, false);
+			w.write("");
+			w.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void log(String text) {
 		
 		File f = new File("output.txt");
 		try {
@@ -329,7 +367,7 @@ public class Cracker {
 		}
 	}
 	
-	public static void test_functions() {
+	private static void test_functions() {
 		
 		try {
 			
@@ -444,17 +482,28 @@ public class Cracker {
 	
 	public static void main(String[] args) {
 
-		System.out.println("Hello world!");
+//		System.out.println("Hello world!");
 		
 //		randomTests();
-		test_functions();
+//		test_functions();
 		
-//		long initialTime = System.currentTimeMillis();
-//		
-//		String password = crack();
-//		
-//		log("Password: " + password);
-//		log("Time taken: " + Long.toString(System.currentTimeMillis() - initialTime) + "ms");
+		clearOutputFile();
+		
+		log("Starting crack()!");
+		log("Current date/time: " + INITIAL_DATE.toString());
+		log("In we go!");
+		log("");
+		log("===");
+		log("");
+		
+		String password = crack();
+		
+		log("===");
+		log("");
+		log("Cracked password: " + password);
+		log("Final date/time:              " + new Date().toString());
+		log("As a reminder, we started at: " + INITIAL_DATE.toString());
+		log("Total time taken: " + Long.toString(System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
 		
 
 	}
