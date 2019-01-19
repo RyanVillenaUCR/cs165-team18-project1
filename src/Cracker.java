@@ -9,6 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Time;
 import java.util.Arrays;
 
+import com.sun.org.apache.xml.internal.security.algorithms.MessageDigestAlgorithm;
+
 
 public class Cracker {
 
@@ -90,7 +92,7 @@ public class Cracker {
 		md.update(alternateSum, 0, password.length());	//only works because pw.len() is always <= 6
 		
 		String pwLengthBitString = Integer.toBinaryString(password.length());
-		for (int i = password.length() - 1; i >= 0; i--) {
+		for (int i = pwLengthBitString.length() - 1; i >= 0; i--) {
 			
 			if (pwLengthBitString.charAt(i) == '1')
 				md.update( (byte) '\0');
@@ -101,13 +103,13 @@ public class Cracker {
 		return md.digest();
 	}
 	
-	public static byte[] getAlternateSum(String password)
+	public static byte[] getAlternateSum(String password, String salt)
 			throws NoSuchAlgorithmException {
 		
 		MessageDigest md = MessageDigest.getInstance(MD5);
 		
 		md.update(password.getBytes());
-		md.update(SALT.getBytes());
+		md.update(salt.getBytes());
 		md.update(password.getBytes());
 		
 		return md.digest();
@@ -156,9 +158,10 @@ public class Cracker {
 	
 	public static String cryptBase64(byte[] encryptMe) {
 		
+		assert encryptMe.length == 16;
+		
 		//Convert encryptMe to one huge bitstring
 		StringBuilder sb = new StringBuilder();
-		
 		for (int i = 0; i < encryptMe.length; i++) {
 			
 			String binary_byte = Integer.toBinaryString(encryptMe[i]);
@@ -166,7 +169,12 @@ public class Cracker {
 		}
 		String bitstring = sb.toString();
 		
-		
+		//DEBUG
+		System.out.println("encryptMe: \"" + encryptMe.toString() + "\"");
+		System.out.println("encryptMe.length: " + encryptMe.length);
+		System.out.println("bitstring: " + bitstring);
+		System.out.println("bitstring.length(): " + bitstring.length());
+		System.out.println("");
 		
 		//Then, store 22 groups of 6-bit bitstrings into an array
 		String[] miniBitstrings = new String[22];
@@ -196,13 +204,14 @@ public class Cracker {
 		
 		try {
 			
-			byte[] alternateSum = getAlternateSum(password);
+			byte[] alternateSum = getAlternateSum(password, SALT);
 			byte[] intermediate_0 = getIntermediate_0(password, alternateSum);
 			byte[] intermediate_1000 = getIntermediate_1000(password, alternateSum, intermediate_0);
 		
 			//now, intermediate is intermediate_1000
 			assert intermediate_1000.length == 16;
 			shuffleBytes(intermediate_1000);
+			assert intermediate_1000.length == 16;
 			
 			String finalHash = cryptBase64(intermediate_1000);
 			assert finalHash.length() == 22;
@@ -245,6 +254,33 @@ public class Cracker {
 //		writeToOutputFile("Will I append or overwrite? Hopefully overwrite!");
 //		writeToOutputFile("Aaaaand, testing if I can write multiple lines!");
 //		writeToOutputFile("wait am i even changing anything here?");
+		
+//		byte b = 0x6e;
+//		System.out.println(b);
+		
+//		try {
+//			
+//			MessageDigest md = MessageDigest.getInstance(MD5);
+//			String pw = "abcdef";
+//			String salt = "hfT7jp2q";
+//			
+//			md.update(pw.getBytes());
+//			md.update(salt.getBytes());
+//			md.update(pw.getBytes());
+//			
+//			byte[] output = md.digest();
+//			
+//			System.out.println("Output: \"" + output + "\"");
+//			System.out.println("output length: " + output.length);
+//			System.out.println("Output.toString(): \"" + output.toString() + "\"");
+//			System.out.println("Output toString length: " + output.toString().length());
+//			
+//		} catch (NoSuchAlgorithmException e) {
+//			
+//			e.printStackTrace();
+//		}
+		
+		
 	}
 		
 	public static void log(String text) {
@@ -277,18 +313,55 @@ public class Cracker {
 		}
 	}
 	
+	public static void test_functions() {
+		
+		try {
+			
+			String password = "abcdef";
+			String salt = "hfT7jp2q";
+			
+			
+			
+			//Test Alternate Sum
+//			byte[] expectedAlternateSum = "8c:84:bb:09:04:89:d3:04:49:26:09:3f:48:1f:7f:46";
+			byte[] expectedAlternateSum = {
+					(byte) 0x8c, (byte) 0x84, (byte) 0xbb, 0x09,
+					0x04, (byte) 0x89, (byte) 0xd3, 0x04,
+					0x49, 0x26, 0x09, 0x3f,
+					0x48, 0x1f, 0x7f, 0x46
+			};
+			byte[] actualAlternateSum = getAlternateSum(password, salt);
+			System.out.println("Expected AlternateSum: \"" + Arrays.toString(expectedAlternateSum) + "\"");
+			System.out.println("Actual AlternateSum:   \"" + Arrays.toString(actualAlternateSum) + "\"");
+			System.out.println(Arrays.equals(expectedAlternateSum, actualAlternateSum));
+			
+			String strAlternateSum = getAlternateSum(password, salt).toString();
+			System.out.println(strAlternateSum);
+			
+			
+			
+			
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+	}
+	
 	public static void main(String[] args) {
 
 		System.out.println("Hello world!");
 		
 //		randomTests();
+		test_functions();
 		
-		long initialTime = System.currentTimeMillis();
-		
-		String password = crack();
-		
-		log("Password: " + password);
-		log("Time taken: " + Long.toString(System.currentTimeMillis() - initialTime) + "ms");
+//		long initialTime = System.currentTimeMillis();
+//		
+//		String password = crack();
+//		
+//		log("Password: " + password);
+//		log("Time taken: " + Long.toString(System.currentTimeMillis() - initialTime) + "ms");
 		
 
 	}
