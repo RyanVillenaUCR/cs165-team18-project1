@@ -183,47 +183,28 @@ public class Cracker {
 		//Convert encryptMe to one huge bitstring
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < encryptMe.length; i++) {
-			
-			String binary_byte = Integer.toBinaryString(encryptMe[i]);
+
+			String binary_byte = toBitstring(encryptMe[i]);
 			sb.append(binary_byte);
-			
-			System.out.println("encryptMe[" + i + "]: " + encryptMe[i]);
-			System.out.println("binary representation of this byte: " + binary_byte);
-			System.out.println("");
 		}
 		String bitstring = sb.toString();
+		bitstring = bitstring.substring(2);	//First 2 chars will not be used
 		
-		//DEBUG
-//		System.out.println("encryptMe: \"" + encryptMe.toString() + "\"");
-//		System.out.println("encryptMe.length: " + encryptMe.length);
-		System.out.println("bitstring: " + bitstring);
-		System.out.println("bitstring.length(): " + bitstring.length());
-		System.out.println("");
-		
-		//Then, store 22 groups of 6-bit bitstrings into an array
-		String[] miniBitstrings = new String[22];
+		//Then, store 21 groups of 6-bit bitstrings into an array
+		String[] miniBitstrings = new String[21];
 		for (int i = 0; i < miniBitstrings.length; i++) {
 			
 			int offset_index = 6 * i;
 			String substr = bitstring.substring(offset_index, offset_index + 6);
 			miniBitstrings[i] = substr;
+
 		}
-		
-//		System.out.println("miniBitStrings: " + Arrays.toString(miniBitstrings));
-		
 		
 		//Finally, output the corresponding CryptBase64 character to each miniBitstring's decimal conversion
 		StringBuilder finalResult = new StringBuilder();
-//		for (int i = 0; i < 22; i++) {	//TODO figure out which to use
-		for (int i = 21; i >= 0; i--) {
+		for (int i = miniBitstrings.length - 1; i >= 0; i--) {
 			
 			int index = Integer.parseInt(miniBitstrings[i], 2);
-//			System.out.println("miniBitstrings[" + i + "]: " + miniBitstrings[i]);
-//			System.out.println("Corresponding index: " + Integer.parseInt(miniBitstrings[i], 2));
-//			System.out.println("Corresponding byte: " + (byte) CRYPT_BASE64.charAt(index));
-//			System.out.println("Corresponding char: " + CRYPT_BASE64.charAt(index));
-//			System.out.println("");
-//			byte c = (byte) CRYPT_BASE64.charAt(index);
 			char c = CRYPT_BASE64.charAt(index);
 			finalResult.append(c);
 		}
@@ -311,9 +292,9 @@ public class Cracker {
 //			e.printStackTrace();
 //		}
 		
-		byte b = -61;
-		System.out.println("Testing byte with value " + b);
-		System.out.println("Bitstring: " + toBitstring(b));
+//		byte b = -61;
+//		System.out.println("Testing byte with value " + b);
+//		System.out.println("Bitstring: " + toBitstring(b));
 	}
 		
 	public static void log(String text) {
@@ -427,8 +408,6 @@ public class Cracker {
 			System.out.println("Expected CryptBase64: " + expectedCryptBase64);
 			System.out.println("Actual CryptBase 64:  " + actualCryptBase64);
 			System.out.println("Works? " + expectedCryptBase64.equals(actualCryptBase64));
-			System.out.println("Expected CryptBase64 length: " + expectedCryptBase64.length());
-			System.out.println("Actual CryptBase64 length:   " + actualCryptBase64.length());
 			System.out.println("");
 			
 			
@@ -445,8 +424,8 @@ public class Cracker {
 
 		System.out.println("Hello world!");
 		
-		randomTests();
-//		test_functions();
+//		randomTests();
+		test_functions();
 		
 //		long initialTime = System.currentTimeMillis();
 //		
