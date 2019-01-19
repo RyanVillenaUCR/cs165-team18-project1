@@ -158,8 +158,6 @@ public class Cracker {
 	
 	public static String cryptBase64(byte[] encryptMe) {
 		
-		assert encryptMe.length == 16;
-		
 		//Convert encryptMe to one huge bitstring
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < encryptMe.length; i++) {
@@ -170,11 +168,11 @@ public class Cracker {
 		String bitstring = sb.toString();
 		
 		//DEBUG
-		System.out.println("encryptMe: \"" + encryptMe.toString() + "\"");
-		System.out.println("encryptMe.length: " + encryptMe.length);
-		System.out.println("bitstring: " + bitstring);
-		System.out.println("bitstring.length(): " + bitstring.length());
-		System.out.println("");
+//		System.out.println("encryptMe: \"" + encryptMe.toString() + "\"");
+//		System.out.println("encryptMe.length: " + encryptMe.length);
+//		System.out.println("bitstring: " + bitstring);
+//		System.out.println("bitstring.length(): " + bitstring.length());
+//		System.out.println("");
 		
 		//Then, store 22 groups of 6-bit bitstrings into an array
 		String[] miniBitstrings = new String[22];
@@ -323,7 +321,6 @@ public class Cracker {
 			
 			
 			//Test Alternate Sum
-//			byte[] expectedAlternateSum = "8c:84:bb:09:04:89:d3:04:49:26:09:3f:48:1f:7f:46";
 			byte[] expectedAlternateSum = {
 					(byte) 0x8c, (byte) 0x84, (byte) 0xbb, 0x09,
 					0x04, (byte) 0x89, (byte) 0xd3, 0x04,
@@ -334,7 +331,46 @@ public class Cracker {
 			System.out.println("Expected AlternateSum: \"" + Arrays.toString(expectedAlternateSum) + "\"");
 			System.out.println("Actual AlternateSum:   \"" + Arrays.toString(actualAlternateSum) + "\"");
 			System.out.println("Works? " + Arrays.equals(expectedAlternateSum, actualAlternateSum));
+			System.out.println("");
 			
+			
+			
+			//Test Intermediate0
+			byte[] expectedIntermediate0 = {
+					       0x72,        0x24,        0x56,        0x0b,
+					       0x3e,        0x7a, (byte) 0xd1, (byte) 0xfa,
+					(byte) 0xb8,        0x7f,        0x05,        0x6b,
+					(byte) 0x94, (byte) 0xbd, (byte) 0x9b,        0x06
+			};
+			byte[] actualIntermediate0 = getIntermediate_0(password, actualAlternateSum);
+			System.out.println("Expected Intermediate_0: " + Arrays.toString(expectedIntermediate0));
+			System.out.println("Actual Intermediate_0:   " + Arrays.toString(actualIntermediate0));
+			System.out.println("Works? " + Arrays.equals(expectedIntermediate0, actualIntermediate0));
+			System.out.println("");
+			
+			
+			//Test Intermediate1000
+			byte[] expectedIntermediate1000 = {
+					       0x3f, (byte) 0xb1, (byte) 0xf8,        0x62,
+					       0x3a,        0x46, (byte) 0xb7, (byte) 0xbf,
+					(byte) 0xb8,        0x17,        0x3c,        0x38,
+					(byte) 0xcb, (byte) 0x9e, (byte) 0xb7, (byte) 0xb5
+			};
+			byte[] actualIntermediate1000 = getIntermediate_1000(password, actualAlternateSum, actualIntermediate0);
+			System.out.println("Expected Intermediate_1000: " + Arrays.toString(expectedIntermediate1000));
+			System.out.println("Actual Intermediate_1000:   " + Arrays.toString(actualIntermediate1000));
+			System.out.println("Works? " + Arrays.equals(expectedIntermediate1000, actualIntermediate1000));
+			System.out.println("");
+			
+			
+			
+			//Test cryptBase64
+			String expectedCryptBase64 = "9TvDSyPgrW9ypSVM4lXCs";
+			String actualCryptBase64 = cryptBase64(actualIntermediate1000);
+			System.out.println("Expected CryptBase64: " + expectedCryptBase64);
+			System.out.println("Actual CryptBase 64:  " + actualCryptBase64);
+			System.out.println("Works? " + expectedCryptBase64.equals(actualCryptBase64));
+			System.out.println("");
 			
 			
 			
