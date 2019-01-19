@@ -79,7 +79,7 @@ public class Cracker {
 //					}
 //				}
 				
-				log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime() * 1000) + "s");
+				log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
 				log("Finished all strings of all lengths starting with " + s2 + "____");
 				float nest1_percent = (float) ((c1 - 'a') * 100 / 26.0); //not c1 - 'a' + 1 because first nest hasn't yet finished
 				float nest2_percent = (float) ((c2 - 'a' + 1) * 100 / (26.0 * 26.0));
@@ -89,7 +89,7 @@ public class Cracker {
 				
 			}
 			
-			log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime() * 1000) + "s");
+			log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
 			log("Finished all strings of all lengths starting with " + s1 + "_____");
 			log((float) ((c1 - 'a' + 1) * 100 / 26.0) + "%  of all possible strings tested.");
 			log("Current date/time: " + new Date().toString());
@@ -503,8 +503,7 @@ public class Cracker {
 		log("Cracked password: " + password);
 		log("Final date/time:              " + new Date().toString());
 		log("As a reminder, we started at: " + INITIAL_DATE.toString());
-		log("Total time taken: " + Long.toString(System.currentTimeMillis() - INITIAL_DATE.getTime() * 1000) + "s");
-		
+		log("Total time taken: " + Long.toString(System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");		
 
 	}
 
