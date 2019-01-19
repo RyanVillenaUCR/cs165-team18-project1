@@ -155,6 +155,29 @@ public class Cracker {
 			shuffleMe[i] = temp[key[i]];
 		}
 	}
+		
+	public static boolean[] toBinaryArray(byte b) {
+		
+		boolean[] bitstring = new boolean[8];
+
+		int integer = (b & 0x00FF);
+		
+		String bin_str = Integer.toBinaryString(integer);
+		assert bin_str.length() <= 8;
+		
+		int extraZeroes = (-1 * bin_str.length()) + 8;	//needed to make bin_str exactly 8 elements big
+		for (int i = 0; i < extraZeroes; i++) {
+			bin_str = "0" + bin_str;
+		}
+		assert bin_str.length() == 8;		
+		
+		for (int i = 0; i < 8; i++) {
+			
+			bitstring[i] = (bin_str.charAt(i) == '1');
+		}
+			
+		return bitstring;
+	}
 	
 	public static String cryptBase64(byte[] encryptMe) {
 		
@@ -164,15 +187,19 @@ public class Cracker {
 			
 			String binary_byte = Integer.toBinaryString(encryptMe[i]);
 			sb.append(binary_byte);
+			
+			System.out.println("encryptMe[" + i + "]: " + encryptMe[i]);
+			System.out.println("binary representation of this byte: " + binary_byte);
+			System.out.println("");
 		}
 		String bitstring = sb.toString();
 		
 		//DEBUG
 //		System.out.println("encryptMe: \"" + encryptMe.toString() + "\"");
 //		System.out.println("encryptMe.length: " + encryptMe.length);
-//		System.out.println("bitstring: " + bitstring);
-//		System.out.println("bitstring.length(): " + bitstring.length());
-//		System.out.println("");
+		System.out.println("bitstring: " + bitstring);
+		System.out.println("bitstring.length(): " + bitstring.length());
+		System.out.println("");
 		
 		//Then, store 22 groups of 6-bit bitstrings into an array
 		String[] miniBitstrings = new String[22];
@@ -285,7 +312,9 @@ public class Cracker {
 //			e.printStackTrace();
 //		}
 		
-		
+		byte b = -61;
+		System.out.println("Testing byte with value " + b);
+		System.out.println("Bitstring: " + Arrays.toString(toBinaryArray(b)));
 	}
 		
 	public static void log(String text) {
@@ -417,8 +446,8 @@ public class Cracker {
 
 		System.out.println("Hello world!");
 		
-//		randomTests();
-		test_functions();
+		randomTests();
+//		test_functions();
 		
 //		long initialTime = System.currentTimeMillis();
 //		
