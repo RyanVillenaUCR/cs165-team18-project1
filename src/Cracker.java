@@ -43,41 +43,41 @@ public class Cracker {
 				if (hash(s2, SALT).equals(HASH))
 					return s2;
 				
-//				for (char c3 = 'a'; c3 <= 'z'; c3++) {
-//					
-//					String s3 = new String(s2);
-//					s3 += c3;
-//					
-//					if (hash(s3, SALT).equals(HASH))
-//						return s3;
-//					
-//					for (char c4 = 'a'; c4 <= 'z'; c4++) {
-//						
-//						String s4 = new String(s3);
-//						s4 += c4;
-//						
-//						if (hash(s4, SALT).equals(HASH))
-//							return s4;
-//						
-//						for (char c5 = 'a'; c5 <= 'z'; c5++) {
-//							
-//							String s5 = new String(s4);
-//							s5 += c5;
-//							
-//							if (hash(s5, SALT).equals(HASH))
-//								return s5;
-//							
-//							for (char c6 = 'a'; c6 <= 'z'; c6++) {
-//								
-//								String s6 = new String(s5);
-//								s6 += c6;
-//								
-//								if (hash(s6, SALT).equals(HASH))
-//									return s6;
-//							}
-//						}
-//					}
-//				}
+				for (char c3 = 'a'; c3 <= 'z'; c3++) {
+					
+					String s3 = new String(s2);
+					s3 += c3;
+					
+					if (hash(s3, SALT).equals(HASH))
+						return s3;
+					
+					for (char c4 = 'a'; c4 <= 'z'; c4++) {
+						
+						String s4 = new String(s3);
+						s4 += c4;
+						
+						if (hash(s4, SALT).equals(HASH))
+							return s4;
+						
+						for (char c5 = 'a'; c5 <= 'z'; c5++) {
+							
+							String s5 = new String(s4);
+							s5 += c5;
+							
+							if (hash(s5, SALT).equals(HASH))
+								return s5;
+							
+							for (char c6 = 'a'; c6 <= 'z'; c6++) {
+								
+								String s6 = new String(s5);
+								s6 += c6;
+								
+								if (hash(s6, SALT).equals(HASH))
+									return s6;
+							}
+						}
+					}
+				}
 				
 				log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
 				log("Finished all strings of all lengths starting with " + s2 + "____");
