@@ -29,7 +29,7 @@ public class Cracker {
 			String s1 = new String();
 			s1 += c1;
 			
-			if (hash(s1).equals(HASH))
+			if (hash(s1, SALT).equals(HASH))
 				return s1;
 			
 			for (char c2 = 'a'; c2 <= 'z'; c2++) {
@@ -37,7 +37,7 @@ public class Cracker {
 				String s2 = new String(s1);
 				s2 += c2;
 				
-				if (hash(s2).equals(HASH))
+				if (hash(s2, SALT).equals(HASH))
 					return s2;
 				
 				for (char c3 = 'a'; c3 <= 'z'; c3++) {
@@ -45,7 +45,7 @@ public class Cracker {
 					String s3 = new String(s2);
 					s3 += c3;
 					
-					if (hash(s3).equals(HASH))
+					if (hash(s3, SALT).equals(HASH))
 						return s3;
 					
 					for (char c4 = 'a'; c4 <= 'z'; c4++) {
@@ -53,7 +53,7 @@ public class Cracker {
 						String s4 = new String(s3);
 						s4 += c4;
 						
-						if (hash(s4).equals(HASH))
+						if (hash(s4, SALT).equals(HASH))
 							return s4;
 						
 						for (char c5 = 'a'; c5 <= 'z'; c5++) {
@@ -61,7 +61,7 @@ public class Cracker {
 							String s5 = new String(s4);
 							s5 += c5;
 							
-							if (hash(s5).equals(HASH))
+							if (hash(s5, SALT).equals(HASH))
 								return s5;
 							
 							for (char c6 = 'a'; c6 <= 'z'; c6++) {
@@ -69,7 +69,7 @@ public class Cracker {
 								String s6 = new String(s5);
 								s6 += c6;
 								
-								if (hash(s6).equals(HASH))
+								if (hash(s6, SALT).equals(HASH))
 									return s6;
 							}
 						}
@@ -212,11 +212,11 @@ public class Cracker {
 		return finalResult.toString();
 	}
 	
-	public static String hash(String password) {
+	public static String hash(String password, String salt) {
 		
 		try {
 			
-			byte[] alternateSum = getAlternateSum(password, SALT);
+			byte[] alternateSum = getAlternateSum(password, salt);
 			byte[] intermediate_0 = getIntermediate_0(password, alternateSum);
 			byte[] intermediate_1000 = getIntermediate_1000(password, alternateSum, intermediate_0);
 		
@@ -226,7 +226,6 @@ public class Cracker {
 			assert intermediate_1000.length == 16;
 			
 			String finalHash = cryptBase64(intermediate_1000);
-			assert finalHash.length() == 22;
 			
 			return finalHash;
 			
@@ -408,6 +407,16 @@ public class Cracker {
 			System.out.println("Expected CryptBase64: " + expectedCryptBase64);
 			System.out.println("Actual CryptBase 64:  " + actualCryptBase64);
 			System.out.println("Works? " + expectedCryptBase64.equals(actualCryptBase64));
+			System.out.println("");
+			
+			
+			
+			//Test hash
+			String expectedHash = "9TvDSyPgrW9ypSVM4lXCs";
+			String actualHash = hash(password, salt);
+			System.out.println("Expected hash: " + expectedHash);
+			System.out.println("Actual hash:   " + actualHash);
+			System.out.println("Works? " + expectedHash.equals(actualHash));
 			System.out.println("");
 			
 			
