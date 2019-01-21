@@ -18,6 +18,9 @@ public class Cracker {
 	final private static String SALT  = "hfT7jp2q";
 	final private static String HASH  = "JU0X9xRQyTWTWY59e3Iqj1";
 	final private static String MAGIC = "$1$";
+	final private static String BONUS_SALT = SALT;
+	final private static String BONUS_HASH = "yKkGOHLs7BZiNuh03um670";
+	
 	
 	final private static String MD5   = "MD5";	//for instantiating MessageDigests
 	
@@ -79,27 +82,98 @@ public class Cracker {
 					}
 				}
 				
-				log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
-				log("Finished all strings of all lengths starting with " + s2 + "____");
-				float nest1_percent = (float) ((c1 - 'a') * 100 / 26.0); //not c1 - 'a' + 1 because first nest hasn't yet finished
-				float nest2_percent = (float) ((c2 - 'a' + 1) * 100 / (26.0 * 26.0));
-				log((float) (nest1_percent + nest2_percent) + "%  of all possible strings tested.");
-				log("Current date/time: " + new Date().toString());
-				log("");
+				crack_log(s2);
+//				log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
+//				log("Finished all strings of all lengths starting with " + s2 + "____");
+//				float nest1_percent = (float) ((c1 - 'a') * 100 / 26.0); //not c1 - 'a' + 1 because first nest hasn't yet finished
+//				float nest2_percent = (float) ((c2 - 'a' + 1) * 100 / (26.0 * 26.0));
+//				log((float) (nest1_percent + nest2_percent) + "%  of all possible strings tested.");
+//				log("Current date/time: " + new Date().toString());
+//				log("");
 				
 			}
-			
-			log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
-			log("Finished all strings of all lengths starting with " + s1 + "_____");
-			log((float) ((c1 - 'a' + 1) * 100 / 26.0) + "%  of all possible strings tested.");
-			log("Current date/time: " + new Date().toString());
-			log("");
+			crack_log(s1);
 		}
 		
 		return "Crack failed";
 	}
 	
-	private static byte[] getIntermediate_0(String password, byte[] alternateSum)
+	private static String crack_bonus() {
+		
+		for (char c1 = 'a'; c1 <= 'z'; c1++) {
+			
+			for (char c2 = 'a'; c2 <= 'z'; c2++) {
+				
+				for (char c3 = 'a'; c3 <= 'z'; c3++) {
+					
+					for (char c4 = 'a'; c4 <= 'z'; c4++) {
+						
+						for (char c5 = 'a'; c5 <= 'z'; c5++) {
+							
+							for (char c6 = 'a'; c6 <= 'z'; c6++) {
+								
+								for (char c7 = 'a'; c7 <= 'z'; c7++) {
+									
+									for (char c8 = 'a'; c8 <= 'z'; c8++) {
+										
+										String password = "" + c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8;
+										
+										if (hash(password, BONUS_SALT).equals(BONUS_HASH)) {
+											
+											return password;
+										}
+									}
+								}
+							}
+						}
+						crack_log("" + c1 + c2 + c3 + c4);
+					}
+					crack_log("" + c1 + c2 + c3);
+				}
+				crack_log("" + c1 + c2);
+			}
+			crack_log("" + c1);
+		}
+		
+		return "";
+	}
+	
+	private static void crack_log(String charsSoFar) {
+		
+		assert(charsSoFar.length() >= 1);
+		
+		int depth = charsSoFar.length();
+		
+		float totalPercentage = 0;
+		for (int i = 0; i < depth; i++) {
+			
+			int thisNumerator = charsSoFar.charAt(i) - 'a';
+			if (i == depth - 1) {	//If you're the last iteration, then you've just completed and must add 1
+				thisNumerator++;
+			}
+			thisNumerator *= 100; 	//convert to percentage
+			
+			float thisDenominator = (float) Math.pow(26, i + 1);
+			
+			totalPercentage += thisNumerator / thisDenominator;
+		}
+		
+		String underscores = "";
+		int numOfUnderscores = 8 - charsSoFar.length();
+		for (int i = 0; i < numOfUnderscores; i++) {
+			underscores += '_';
+		}
+		
+		
+		
+		log("Elapsed time: " + (System.currentTimeMillis() - INITIAL_DATE.getTime()) + "ms");
+		log("Finished all strings of all lengths starting with " + charsSoFar + underscores);
+		log(totalPercentage + "%  of all possible strings tested.");
+		log("Current date/time: " + new Date().toString());
+		log("");
+	}
+	
+ 	private static byte[] getIntermediate_0(String password, byte[] alternateSum)
 			throws NoSuchAlgorithmException {
 			
 		MessageDigest md = MessageDigest.getInstance(MD5);
@@ -315,6 +389,8 @@ public class Cracker {
 //		byte b = -61;
 //		System.out.println("Testing byte with value " + b);
 //		System.out.println("Bitstring: " + toBitstring(b));
+		
+		
 	}
 		
 	private static void clearOutputFile() {
@@ -470,6 +546,14 @@ public class Cracker {
 			System.out.println("Works? " + expectedHash2.equals(actualHash2));
 			System.out.println("");
 			
+			//Test hash 3
+			String expectedHash3 = HASH;
+			String actualHash3 = hash("lncbdd", SALT);
+			System.out.println("Expected hash: " + expectedHash3);
+			System.out.println("Actual hash:   " + actualHash3);
+			System.out.println("Works? " + expectedHash3.equals(actualHash3));
+			System.out.println("");
+			
 			
 			
 		} catch (NoSuchAlgorithmException e) {
@@ -484,7 +568,7 @@ public class Cracker {
 
 //		System.out.println("Hello world!");
 		
-//		randomTests();
+		randomTests();
 //		test_functions();
 		
 		clearOutputFile();
@@ -496,7 +580,8 @@ public class Cracker {
 		log("===");
 		log("");
 		
-		String password = crack();
+//		String password = crack();
+		String password = crack_bonus();
 		
 		log("===");
 		log("");
