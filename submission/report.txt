@@ -1,0 +1,19 @@
+1) Source code attached - see Cracker.java.
+   To run this code on your machine, run "javac Cracker.java" then "java Cracker".
+   
+   
+   
+2) 1 thread used. No multithreading involved. However, other tasks were being run on the machine at the time of use, so there may be fluctuations in performance. Please see final_output.txt, which is a log of Cracker's performance as it tested passwords. There are timestamps scattered throughout it to give a clear indication of where it was at certain points in its execution.
+
+
+
+3) Intel(R) Pentium(R) CPU  N3700  @ 1.60GHz, 1601 Mhz, 4 Core(s), 4 Logical Processor(s). Please see specs.png for more detailed information.
+
+
+
+4) Cracker took 15488940ms to test all possible passwords starting with the letter a. This includes passwords of length 1 (e.g. 'a'), length 2 (e.g. 'aa', 'ab', etc.), all the way up to 'azzzzz' (the last 6-character password which starts with a). This means that there are 26 + (26^2) + (26^3) + ... + (26^6) passwords which start with a, or 321272406 passwords.
+
+   Then, our throughput is simply <amount of passwords> / <time taken>, or (321272406 passwords) / (15488.940 s). So, the throughput is 767 passwords per second.
+
+   This number may seem low. It is! But, there are several factors to consider here. First, the machine in use here is running a Pentium and is extremely outdated (see specs.png for more info). Second, this machine was in use with other applications at runtime. At one point in runtime, it was forced into hibernation because of low battery. This would have affected the program's throughput significantly. Finally, the program would log its progress to the console and to an external .txt file (see final_output.txt) at regular intervals. Opening and closing i/o streams to files is actually an expensive operation, so this too could have affected our calculation for throughput.
+
